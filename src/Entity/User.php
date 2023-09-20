@@ -26,7 +26,7 @@ class User
     private ?string $email = null;
 
     #[ORM\Column]
-    private ?int $phoneNumber = null;
+    private ?string $phoneNumber = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
@@ -85,12 +85,12 @@ class User
         return $this;
     }
 
-    public function getPhoneNumber(): ?int
+    public function getPhoneNumber(): ?string
     {
         return $this->phoneNumber;
     }
 
-    public function setPhoneNumber(int $phoneNumber): static
+    public function setPhoneNumber(string $phoneNumber): static
     {
         $this->phoneNumber = $phoneNumber;
 

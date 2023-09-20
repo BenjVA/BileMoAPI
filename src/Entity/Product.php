@@ -26,9 +26,6 @@ class Product
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'products')]
-    private ?Customer $customer = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -78,18 +75,6 @@ class Product
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getCustomer(): ?Customer
-    {
-        return $this->customer;
-    }
-
-    public function setCustomer(?Customer $customer): static
-    {
-        $this->customer = $customer;
 
         return $this;
     }
