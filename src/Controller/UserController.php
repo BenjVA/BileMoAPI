@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Repository\CustomerRepository;
 use App\Repository\UserRepository;
 use Hateoas\Configuration\Route as HateoasRoute;
@@ -9,12 +10,12 @@ use Hateoas\Representation\CollectionRepresentation;
 use Hateoas\Representation\Factory\PagerfantaFactory;
 use JMS\Serializer\SerializerInterface;
 use Pagerfanta\Adapter\ArrayAdapter;
-use Pagerfanta\Adapter\NullAdapter;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Pagerfanta\Pagerfanta;
@@ -25,6 +26,7 @@ class UserController extends AbstractController
      * @throws InvalidArgumentException
      */
     #[Route('/bilemo/users/', name: 'app_users', methods: ['GET'])]
+    // #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter les utilisateurs')]
     public function getAllUsers(
         UserRepository $userRepository,
         SerializerInterface $serializer,
@@ -55,5 +57,14 @@ class UserController extends AbstractController
         );
 
         return new JsonResponse($jsonUserList, Response::HTTP_OK, [], true);
+    }
+
+    #[Route('/bilemo/users/{id}', name: 'app_users_details', methods: ['GET'])]
+    // #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter un utilisateur')]
+    public function getUserDetail(User $user, SerializerInterface $serializer): JsonResponse
+    {
+        $jsonUser = $serializer->serialize($user, 'json');
+
+        return new JsonResponse($jsonUser, Response::HTTP_OK, [], true);
     }
 }
