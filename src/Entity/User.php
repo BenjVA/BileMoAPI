@@ -9,11 +9,20 @@ use Hateoas\Configuration\Annotation as Hateoas;
 
 /**
  * @Hateoas\Relation(
- *      name = "self",
- *      href = @Hateoas\Route("app_users",
+ *     name = "list",
+ *     href = @Hateoas\Route("app_users",
  *     absolute = true
  *     ),
  *     embedded = "expr(object.getCustomer())",
+ * )
+ *
+ * @Hateoas\Relation(
+ *     name = "details",
+ *     href = @Hateoas\Route(
+ *     "app_users_details",
+ *     parameters = { "id" = "expr(object.getId())" },
+ *     absolute = true
+ *     )
  * )
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
