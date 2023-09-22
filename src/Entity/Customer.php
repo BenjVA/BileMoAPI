@@ -6,9 +6,9 @@ use App\Repository\CustomerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use JMS\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
 class Customer implements UserInterface, PasswordAuthenticatedUserInterface
@@ -16,27 +16,27 @@ class Customer implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllUsers'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['getAllUsers'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(['getAllUsers'])]
     private ?string $name = null;
 
     #[ORM\Column]
+    /** @Serializer\Exclude */
     private array $roles = [];
 
     /**
      * @var ?string The hashed password
      */
     #[ORM\Column]
+    /** @Serializer\Exclude */
     private ?string $password = null;
 
     #[ORM\OneToMany(mappedBy: 'customer', targetEntity: User::class, orphanRemoval: true)]
+    /** @Serializer\Exclude */
     private Collection $users;
 
     public function __construct()

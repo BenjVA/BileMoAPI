@@ -4,14 +4,16 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation as Serializer;
 use Hateoas\Configuration\Annotation as Hateoas;
 
 /**
  * @Hateoas\Relation(
- *      "self",
- *      href = @Hateoas\Route("app_users"),
- *      exclusion = @Hateoas\Exclusion(groups="getAllUsers")
+ *      name = "self",
+ *      href = @Hateoas\Route("app_users",
+ *     absolute = true
+ *     ),
+ *     embedded = "expr(object.getCustomer())",
  * )
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -20,31 +22,29 @@ class User
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getAllUsers'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllUsers'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllUsers'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255)]
+    /** @Serializer\Exclude */
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getAllUsers'])]
     private ?string $email = null;
 
     #[ORM\Column]
-    #[Groups(['getAllUsers'])]
     private ?string $phoneNumber = null;
 
+    /**
+     * @Serializer\Exclude
+     */
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['getAllUsers'])]
     private ?Customer $customer = null;
 
     public function getId(): ?int

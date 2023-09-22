@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Customer;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -21,6 +22,22 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
+    /**
+     * @param Customer $customer
+     *
+     * @return User[] Returns an array of User objects paginated
+     */
+    /*public function getUsersPaginated(Customer $customer): array
+    {
+        return $this->getEntityManager()->createQueryBuilder()
+            ->select('u')
+            ->from('App:User', 'u')
+            ->where("u.customer = :customer")
+            ->setParameter("customer", $customer)
+            ->orderBy('u.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }*/
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */
