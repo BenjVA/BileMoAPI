@@ -4,7 +4,18 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
+use Hateoas\Configuration\Annotation as Hateoas;
 
+/**
+ * @Hateoas\Relation(
+ *      name = "self",
+ *      href = @Hateoas\Route("app_users",
+ *     absolute = true
+ *     ),
+ *     embedded = "expr(object.getCustomer())",
+ * )
+ */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User
 {
@@ -20,6 +31,7 @@ class User
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255)]
+    /** @Serializer\Exclude */
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
@@ -28,6 +40,9 @@ class User
     #[ORM\Column]
     private ?string $phoneNumber = null;
 
+    /**
+     * @Serializer\Exclude
+     */
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Customer $customer = null;
