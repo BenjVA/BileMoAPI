@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Product;
+use App\Repository\ProductRepository;
+use Hateoas\Representation\CollectionRepresentation;
+use Hateoas\Representation\Factory\PagerfantaFactory;
+use JMS\Serializer\SerializerInterface;
+use Pagerfanta\Adapter\ArrayAdapter;
+use Pagerfanta\Pagerfanta;
+use Psr\Cache\InvalidArgumentException;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Hateoas\Configuration\Route as HateoasRoute;
+
+class ProductController extends AbstractController
+{
+    /**
+     * @throws InvalidArgumentException
+     */
+    #[Route('/bilemo/products', name: 'app_products', methods: ['GET'])]
+    // #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter les produits')]
+    public function getAllProducts(
+        ProductRepository $productRepository,
+        SerializerInterface $serializer,
+        TagAwareCacheInterface $cache,
+    ): JsonResponse {
+        $adapter = new ArrayAdapter($productRepository->findAll());
+        $pager = new Pagerfanta($adapter);
+        $pagerFanta = new PagerfantaFactory();
+        $idCache = 'getAllProducts-';
+
+        $productsPaginated = $pagerFanta->createRepresentation(
+            $pager,
+            new HateoasRoute('app_products', array(), true),
+            new CollectionRepresentation($pager->getCurrentPageResults())
+        );
+
+        $jsonProductList = $cache->get(
+            $idCache,
+            function (ItemInterface $item) use ($serializer, $productsPaginated) {
+                echo('L\'élément n\'est pas encore en cache !');
+                $item->tag('productsCache')
+                    ->expiresAfter(60);
+                $productList
+                    = $productsPaginated;
+
+
+                return $serializer->serialize($productList, 'json');
+            }
+        );
+
+        return new JsonResponse($jsonProductList, Response::HTTP_OK, [], true);
+    }
+}
