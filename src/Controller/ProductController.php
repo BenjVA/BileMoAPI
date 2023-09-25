@@ -57,4 +57,15 @@ class ProductController extends AbstractController
 
         return new JsonResponse($jsonProductList, Response::HTTP_OK, [], true);
     }
+
+    #[Route('/bilemo/products/{id}', name: 'app_products_details', methods: ['GET'])]
+    // #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter un utilisateur')]
+    public function getProductDetails(
+        Product $product,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $jsonProduct = $serializer->serialize($product, 'json');
+
+        return new JsonResponse($jsonProduct, Response::HTTP_OK, [], true);
+    }
 }
