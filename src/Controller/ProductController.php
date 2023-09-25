@@ -32,23 +32,25 @@ class ProductController extends AbstractController
     ): JsonResponse {
         $adapter = new ArrayAdapter($productRepository->findAll());
         $pager = new Pagerfanta($adapter);
-        $pagerFanta = new PagerfantaFactory();
         $idCache = 'getAllProducts-';
-
-        $productsPaginated = $pagerFanta->createRepresentation(
-            $pager,
-            new HateoasRoute('app_products', array(), true),
-            new CollectionRepresentation($pager->getCurrentPageResults())
-        );
 
         $jsonProductList = $cache->get(
             $idCache,
-            function (ItemInterface $item) use ($serializer, $productsPaginated) {
+            function (ItemInterface $item) use ($pager, $serializer) {
+                $pagerFanta = new PagerfantaFactory();
+
                 echo('L\'élément n\'est pas encore en cache !');
                 $item->tag('productsCache')
                     ->expiresAfter(60);
+
                 $productList
-                    = $productsPaginated;
+                    = $pagerFanta->createRepresentation(
+                        $pager,
+                        new HateoasRoute('app_products', array(), true),
+                        new CollectionRepresentation(
+                            $pager->getCurrentPageResults()
+                        )
+                    );
 
 
                 return $serializer->serialize($productList, 'json');

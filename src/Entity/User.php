@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Hateoas\Configuration\Annotation as Hateoas;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 /**
  * @Hateoas\Relation(
@@ -39,8 +40,10 @@ class User
     #[ORM\Column(length: 255)]
     private ?string $lastName = null;
 
+    /**
+     * @Serializer\Exclude
+     */
     #[ORM\Column(length: 255)]
-    /** @Serializer\Exclude */
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
