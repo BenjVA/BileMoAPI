@@ -61,7 +61,7 @@ class ProductController extends AbstractController
     }
 
     #[Route('/bilemo/products/{id}', name: 'app_products_details', methods: ['GET'])]
-    // #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter un utilisateur')]
+    // #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter un produit')]
     public function getProductDetails(
         Product $product,
         SerializerInterface $serializer
