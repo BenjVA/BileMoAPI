@@ -4,8 +4,8 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation\Groups;
 
 /**
  * @Hateoas\Relation(
@@ -31,29 +31,31 @@ class User
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    /** @Groups({"getUsers"}) */
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    /** @Groups({"getUsers"}) */
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
+    /** @Groups({"getUsers"}) */
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255)]
-    /** @Serializer\Exclude */
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
+    /** @Groups({"getUsers"}) */
     private ?string $email = null;
 
     #[ORM\Column]
+    /** @Groups({"getUsers"}) */
     private ?string $phoneNumber = null;
 
-    /**
-     * @Serializer\Exclude
-     */
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
+    /** @Groups({"getUsers"}) */
     private ?Customer $customer = null;
 
     public function getId(): ?int
