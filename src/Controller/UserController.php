@@ -106,4 +106,14 @@ class UserController extends AbstractController
 
         return new JsonResponse($jsonUser, Response::HTTP_CREATED, ['Location' => $location], true);
     }
+
+    #[Route('/bilemo/users/delete/{id}', name: 'app_users_delete', methods: ['DELETE'])]
+    // #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour supprimer un utilisateur')]
+    public function deleteUser(User $user, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $entityManager->remove($user);
+        $entityManager->flush();
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
 }
