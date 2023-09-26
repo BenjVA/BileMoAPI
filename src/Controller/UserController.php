@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Hateoas\Configuration\Route as HateoasRoute;
 use Hateoas\Representation\CollectionRepresentation;
 use Hateoas\Representation\Factory\PagerfantaFactory;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Pagerfanta\Adapter\ArrayAdapter;
 use Psr\Cache\InvalidArgumentException;
@@ -33,26 +34,31 @@ class UserController extends AbstractController
         UserRepository $userRepository,
         SerializerInterface $serializer,
         TagAwareCacheInterface $cache,
+        Request $request
     ): JsonResponse {
-        $adapter = new ArrayAdapter($userRepository->findAll());
-        $pager = new Pagerfanta($adapter);
+        // $adapter = new ArrayAdapter($userRepository->findAll());
+        // $pager = new Pagerfanta($adapter);
         $idCache = 'getAllUsers-';
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 5);
 
         $jsonUserList = $cache->get(
             $idCache,
-            function (ItemInterface $item) use ($pager, $serializer) {
-                $pagerFanta = new PagerfantaFactory();
+            function (ItemInterface $item) use ($serializer, $page, $limit, $userRepository) {
+                // $pagerFanta = new PagerfantaFactory();
                 echo('L\'élément n\'est pas encore en cache !');
                 $item->tag('usersCache')
                     ->expiresAfter(60);
                 $userList
-                    = $pagerFanta->createRepresentation(
+                    = $userRepository->findUsersPaginated($page, $limit);
+                /*$pagerFanta->createRepresentation(
                         $pager,
                         new HateoasRoute('app_users', array(), true),
                         new CollectionRepresentation($pager->getCurrentPageResults())
-                    );
+                    );*/
+                $context = SerializationContext::create()->setGroups(array('getUsers'));
 
-                return $serializer->serialize($userList, 'json');
+                return $serializer->serialize($userList, 'json', $context);
             }
         );
 
@@ -65,7 +71,8 @@ class UserController extends AbstractController
         User $user,
         SerializerInterface $serializer,
     ): JsonResponse {
-        $jsonUser = $serializer->serialize($user, 'json');
+        $context = SerializationContext::create()->setGroups(array('getUsers'));
+        $jsonUser = $serializer->serialize($user, 'json', $context);
 
         return new JsonResponse($jsonUser, Response::HTTP_OK, [], true);
     }
@@ -80,14 +87,16 @@ class UserController extends AbstractController
         CustomerRepository $customerRepository
     ): JsonResponse {
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
-        /*dd($request->query->get('user'));
-        $idCustomer = $request->query->get();
-        $user->setCustomer($customerRepository->find($idCustomer));*/
+
+        $content = $request->toArray();
+        $idCustomer = $content['idCustomer'] ?? -1;
+        $user->setCustomer($customerRepository->find($idCustomer));
 
         $entityManager->persist($user);
         $entityManager->flush();
 
-        $jsonUser = $serializer->serialize($user, 'json');
+        $context = SerializationContext::create()->setGroups(array('getUsers'));
+        $jsonUser = $serializer->serialize($user, 'json', $context);
 
         $location = $urlGenerator->generate(
             'app_users_details',
