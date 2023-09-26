@@ -10,19 +10,41 @@ use JMS\Serializer\Annotation\Groups;
 /**
  * @Hateoas\Relation(
  *     name = "list",
- *     href = @Hateoas\Route("app_users",
+ *     href = @Hateoas\Route(
+ *     "app_users",
  *     absolute = true
  *     ),
  *     embedded = "expr(object.getCustomer())",
+ *     exclusion = @Hateoas\Exclusion(groups="getUsers")
  * )
  *
  * @Hateoas\Relation(
- *     name = "details",
+ *     name = "detailsUser",
  *     href = @Hateoas\Route(
  *     "app_users_details",
  *     parameters = { "id" = "expr(object.getId())" },
  *     absolute = true
- *     )
+ *     ),
+ *     exclusion = @Hateoas\Exclusion(groups="getUsers")
+ * )
+ *
+ * @Hateoas\Relation(
+ *     name = "createUser",
+ *     href = @Hateoas\Route(
+ *     "app_users_create",
+ *     absolute = true
+ *     ),
+ *     exclusion = @Hateoas\Exclusion(groups="getUsers")
+ * )
+ *
+ * @Hateoas\Relation(
+ *     name = "deleteUser",
+ *     href = @Hateoas\Route(
+ *     "app_users_delete",
+ *     parameters = { "id" = "expr(object.getId())" },
+ *     absolute = true
+ *     ),
+ *     exclusion = @Hateoas\Exclusion(groups="getUsers")
  * )
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -55,7 +77,7 @@ class User
 
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
-    /** @Groups({"getUsers"}) */
+
     private ?Customer $customer = null;
 
     public function getId(): ?int
