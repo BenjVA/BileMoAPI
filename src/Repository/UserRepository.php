@@ -6,6 +6,7 @@ use App\Entity\Customer;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -22,31 +23,24 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
-    public function findUsersPaginated($page, $limit)
+    public function findPublicUsersByCustomer(UserInterface $customer)
     {
-        $qb = $this->createQueryBuilder('u')
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit);
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select(
+                'u.id',
+                'u.email',
+                'u.firstName',
+                'u.lastName',
+                'u.phoneNumber',
+            )
+            ->from('App:User', 'u')
+            ->where('u.customer = :customer')
+            ->setParameter('customer', $customer)
+        ;
 
         return $qb->getQuery()->getResult();
     }
 
-    /**
-     * @param Customer $customer
-     *
-     * @return User[] Returns an array of User objects paginated
-     */
-    /*public function getUsersPaginated(Customer $customer): array
-    {
-        return $this->getEntityManager()->createQueryBuilder()
-            ->select('u')
-            ->from('App:User', 'u')
-            ->where("u.customer = :customer")
-            ->setParameter("customer", $customer)
-            ->orderBy('u.id', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }*/
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

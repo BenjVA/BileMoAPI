@@ -48,23 +48,21 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     exclusion = @Hateoas\Exclusion(groups="getUsers")
  * )
  */
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    /** @Groups({"getUsers"}) */
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Un prénom est obligatoire")]
-    /** @Groups({"getUsers"}) */
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Un nom est obligatoire")]
-    /** @Groups({"getUsers"}) */
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255)]
@@ -72,12 +70,10 @@ class User
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Une adresse email est obligatoire")]
-    /** @Groups({"getUsers"}) */
     private ?string $email = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: "Un numéro de téléphone est obligatoire")]
-    /** @Groups({"getUsers"}) */
     private ?string $phoneNumber = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
