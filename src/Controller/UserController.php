@@ -48,8 +48,8 @@ class UserController extends AbstractController
             function (ItemInterface $item) use ($serializer, $page, $limit, $userRepository) {
                 // $pagerFanta = new PagerfantaFactory();
                 echo('L\'élément n\'est pas encore en cache !');
-                $item->tag('usersCache')
-                    ->expiresAfter(60);
+                $item->tag('usersCache');
+                    // ->expiresAfter(60);
                 $userList
                     = $userRepository->findUsersPaginated($page, $limit);
                 /*$pagerFanta->createRepresentation(
@@ -67,7 +67,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/bilemo/users/{id}', name: 'app_users_details', methods: ['GET'])]
-    // #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter un utilisateur')]
+    #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter un utilisateur')]
     public function getUserDetails(
         User $user,
         SerializerInterface $serializer,
@@ -78,6 +78,9 @@ class UserController extends AbstractController
         return new JsonResponse($jsonUser, Response::HTTP_OK, [], true);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     #[Route('/bilemo/users/create', name: 'app_users_create', methods: ['POST'])]
     // #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour créer un utilisateur')]
     public function createUser(
@@ -85,7 +88,8 @@ class UserController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $entityManager,
         UrlGeneratorInterface $urlGenerator,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        TagAwareCacheInterface $cache
     ): JsonResponse {
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
 
@@ -101,6 +105,8 @@ class UserController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
 
+        $cache->invalidateTags(['usersCache']);
+
         $context = SerializationContext::create()->setGroups(array('getUsers'));
         $jsonUser = $serializer->serialize($user, 'json', $context);
 
@@ -113,12 +119,20 @@ class UserController extends AbstractController
         return new JsonResponse($jsonUser, Response::HTTP_CREATED, ['Location' => $location], true);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     #[Route('/bilemo/users/delete/{id}', name: 'app_users_delete', methods: ['DELETE'])]
     // #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour supprimer un utilisateur')]
-    public function deleteUser(User $user, EntityManagerInterface $entityManager): JsonResponse
-    {
+    public function deleteUser(
+        User $user,
+        EntityManagerInterface $entityManager,
+        TagAwareCacheInterface $cache
+    ): JsonResponse {
         $entityManager->remove($user);
         $entityManager->flush();
+
+        $cache->invalidateTags(['usersCache']);
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
