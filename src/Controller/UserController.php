@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Hateoas\Configuration\Route as HateoasRoute;
 use Hateoas\Representation\CollectionRepresentation;
@@ -28,6 +29,7 @@ class UserController extends AbstractController
 {
     /**
      * @throws InvalidArgumentException
+     * @throws Exception
      */
     #[Route('/bilemo/users', name: 'app_users', methods: ['GET'])]
     #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter les utilisateurs')]
@@ -35,31 +37,27 @@ class UserController extends AbstractController
         UserRepository $userRepository,
         SerializerInterface $serializer,
         TagAwareCacheInterface $cache,
-        Request $request
     ): JsonResponse {
-        // $adapter = new ArrayAdapter($userRepository->findAll());
-        // $pager = new Pagerfanta($adapter);
+        $customer = $this->getUser();
+        $adapter = new ArrayAdapter($userRepository->findPublicUsersByCustomer($customer));
+        $pager = new Pagerfanta($adapter);
         $idCache = 'getAllUsers-';
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 5);
 
         $jsonUserList = $cache->get(
             $idCache,
-            function (ItemInterface $item) use ($serializer, $page, $limit, $userRepository) {
-                // $pagerFanta = new PagerfantaFactory();
+            function (ItemInterface $item) use ($serializer, $pager) {
+                $pagerFanta = new PagerfantaFactory();
                 echo('L\'élément n\'est pas encore en cache !');
-                $item->tag('usersCache');
-                    // ->expiresAfter(60);
+                $item->tag('usersCache')
+                    ->expiresAfter(60);
                 $userList
-                    = $userRepository->findUsersPaginated($page, $limit);
-                /*$pagerFanta->createRepresentation(
+                    = $pagerFanta->createRepresentation(
                         $pager,
-                        new HateoasRoute('app_users', array(), true),
+                        new HateoasRoute('app_users', [], true),
                         new CollectionRepresentation($pager->getCurrentPageResults())
-                    );*/
-                $context = SerializationContext::create()->setGroups(array('getUsers'));
+                    );
 
-                return $serializer->serialize($userList, 'json', $context);
+                return $serializer->serialize($userList, 'json');
             }
         );
 
