@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Repository\CustomerRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Hateoas\Configuration\Route as HateoasRoute;
@@ -19,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Pagerfanta\Pagerfanta;
@@ -29,7 +30,7 @@ class UserController extends AbstractController
      * @throws InvalidArgumentException
      */
     #[Route('/bilemo/users', name: 'app_users', methods: ['GET'])]
-    // #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter les utilisateurs')]
+    #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter les utilisateurs')]
     public function getAllUsers(
         UserRepository $userRepository,
         SerializerInterface $serializer,
@@ -84,13 +85,18 @@ class UserController extends AbstractController
         SerializerInterface $serializer,
         EntityManagerInterface $entityManager,
         UrlGeneratorInterface $urlGenerator,
-        CustomerRepository $customerRepository
+        ValidatorInterface $validator
     ): JsonResponse {
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
 
-        $content = $request->toArray();
-        $idCustomer = $content['idCustomer'] ?? -1;
-        $user->setCustomer($customerRepository->find($idCustomer));
+        $customer = $this->getUser();
+        $user->setCustomer($customer);
+
+        $errors = $validator->validate($user);
+
+        if ($errors->count() > 0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
+        }
 
         $entityManager->persist($user);
         $entityManager->flush();

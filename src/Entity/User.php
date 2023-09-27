@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Hateoas\Configuration\Annotation as Hateoas;
 use JMS\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @Hateoas\Relation(
@@ -57,10 +58,12 @@ class User
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Un prénom est obligatoire")]
     /** @Groups({"getUsers"}) */
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Un nom est obligatoire")]
     /** @Groups({"getUsers"}) */
     private ?string $lastName = null;
 
@@ -68,16 +71,17 @@ class User
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Une adresse email est obligatoire")]
     /** @Groups({"getUsers"}) */
     private ?string $email = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Un numéro de téléphone est obligatoire")]
     /** @Groups({"getUsers"}) */
     private ?string $phoneNumber = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
-
     private ?Customer $customer = null;
 
     public function getId(): ?int
