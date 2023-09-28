@@ -1,5 +1,7 @@
 # BileMo API
 
+[![SymfonyInsight](https://insight.symfony.com/projects/c7f41da6-3fc6-409f-bd2e-26c257ab4c50/mini.svg)](https://insight.symfony.com/projects/c7f41da6-3fc6-409f-bd2e-26c257ab4c50)
+
 ![Symfony](https://img.shields.io/badge/symfony-%23000000.svg?style=for-the-badge&logo=symfony&logoColor=white)
 ![PHP](https://img.shields.io/badge/php-%23777BB4.svg?style=for-the-badge&logo=php&logoColor=white)
 
