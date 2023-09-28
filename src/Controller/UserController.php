@@ -119,7 +119,7 @@ class UserController extends AbstractController
      * @throws InvalidArgumentException
      */
     #[Route('/bilemo/users/delete/{id}', name: 'app_users_delete', methods: ['DELETE'])]
-    // #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour supprimer un utilisateur')]
+    #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour supprimer un utilisateur')]
     public function deleteUser(
         User $user,
         EntityManagerInterface $entityManager,
