@@ -11,9 +11,31 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Annotations as OA;
 
 class CustomerController extends AbstractController
 {
+    /**
+     * This method create a customer manually
+     *
+     * @OA\Response(
+     *     response=201,
+     *     description="Create a customer",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Customer::class))
+     *     )
+     * )
+     * @OA\Tag(name="Customer")
+     *
+     * @param EntityManagerInterface      $entityManager
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @param SerializerInterface         $serializer
+     *
+     * @return JsonResponse
+     */
     #[Route('/bilemo/customer/create', name: 'app_customer_create', methods: ['POST'])]
     public function createCustomer(
         EntityManagerInterface $entityManager,

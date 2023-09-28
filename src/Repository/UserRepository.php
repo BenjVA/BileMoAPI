@@ -22,7 +22,7 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
-    public function findPublicUsersByCustomer(UserInterface $customer)
+    public function findPublicUsersByCustomer(UserInterface $customer): array
     {
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select(
