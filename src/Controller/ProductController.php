@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Hateoas\Configuration\Route as HateoasRoute;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ProductController extends AbstractController
 {
@@ -24,7 +25,7 @@ class ProductController extends AbstractController
      * @throws InvalidArgumentException
      */
     #[Route('/bilemo/products', name: 'app_products', methods: ['GET'])]
-    // #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter les produits')]
+    #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter les produits')]
     public function getAllProducts(
         ProductRepository $productRepository,
         SerializerInterface $serializer,

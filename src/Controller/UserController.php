@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
-use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Hateoas\Configuration\Route as HateoasRoute;
 use Hateoas\Representation\CollectionRepresentation;

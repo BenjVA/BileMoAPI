@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CustomerController extends AbstractController
 {
-    #[Route('/bilemo/customer/create', name: 'app_customer_create', methods: ['GET'])]
+    #[Route('/bilemo/customer/create', name: 'app_customer_create', methods: ['POST'])]
     public function createCustomer(
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher,
