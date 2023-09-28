@@ -29,7 +29,6 @@ class UserController extends AbstractController
 {
     /**
      * @throws InvalidArgumentException
-     * @throws Exception
      */
     #[Route('/bilemo/users', name: 'app_users', methods: ['GET'])]
     #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter les utilisateurs')]
