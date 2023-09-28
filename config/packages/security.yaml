@@ -38,6 +38,7 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/bilemo/login, roles: PUBLIC_ACCESS }
+        - { path: ^/bilemo/customer/create, roles: PUBLIC_ACCESS }
         - { path: ^/bilemo, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:

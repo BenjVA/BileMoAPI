@@ -17,10 +17,12 @@ class Customer implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    /** @Groups({"getCustomer"}) */
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank(message: "Une adresse email est obligatoire")]
+    /** @Groups({"getCustomer"}) */
     private ?string $email = null;
 
     #[ORM\Column(length: 180, unique: true)]
@@ -31,6 +33,7 @@ class Customer implements UserInterface, PasswordAuthenticatedUserInterface
         minMessage: "Le nom doit faire au moins {{ limit }} caractères",
         maxMessage: "Le nom ne peut pas faire plus de {{ limit }} caractères"
     )]
+    /** @Groups({"getCustomer"}) */
     private ?string $name = null;
 
     #[ORM\Column(type: 'json')]
