@@ -18,10 +18,29 @@ use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Hateoas\Configuration\Route as HateoasRoute;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Annotations as OA;
 
 class ProductController extends AbstractController
 {
     /**
+     * This method displays all products
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Displays products list",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Product::class))
+     *     )
+     * )
+     * @OA\Tag(name="Products")
+     *
+     * @param ProductRepository      $productRepository
+     * @param SerializerInterface    $serializer
+     * @param TagAwareCacheInterface $cache
+     *
+     * @return JsonResponse
      * @throws InvalidArgumentException
      */
     #[Route('/bilemo/products', name: 'app_products', methods: ['GET'])]
@@ -61,6 +80,24 @@ class ProductController extends AbstractController
         return new JsonResponse($jsonProductList, Response::HTTP_OK, [], true);
     }
 
+    /**
+     * This method displays a single product details
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Displays single product details",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Product::class))
+     *     )
+     * )
+     * @OA\Tag(name="Products")
+     *
+     * @param Product             $product
+     * @param SerializerInterface $serializer
+     *
+     * @return JsonResponse
+     */
     #[Route('/bilemo/products/{id}', name: 'app_products_details', methods: ['GET'])]
     #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter un produit')]
     public function getProductDetails(

@@ -71,7 +71,7 @@ class User
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 191, unique: true)]
     #[Assert\NotBlank(message: "Une adresse email est obligatoire")]
     /** @Groups({"getUsers"}) */
     private ?string $email = null;

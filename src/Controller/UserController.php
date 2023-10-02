@@ -23,10 +23,29 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Pagerfanta\Pagerfanta;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Annotations as OA;
 
 class UserController extends AbstractController
 {
     /**
+     * This method displays all users linked to a customer
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Displays users list by customer",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=User::class))
+     *     )
+     * )
+     * @OA\Tag(name="Users")
+     *
+     * @param UserRepository         $userRepository
+     * @param SerializerInterface    $serializer
+     * @param TagAwareCacheInterface $cache
+     *
+     * @return JsonResponse
      * @throws InvalidArgumentException
      */
     #[Route('/bilemo/users', name: 'app_users', methods: ['GET'])]
@@ -62,6 +81,24 @@ class UserController extends AbstractController
         return new JsonResponse($jsonUserList, Response::HTTP_OK, [], true);
     }
 
+    /**
+     * This method displays a single user details
+     *
+     * @OA\Response(
+     *     response=200,
+     *     description="Displays users details",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=User::class, groups={"getUsers"}))
+     *     )
+     * )
+     * @OA\Tag(name="Users")
+     *
+     * @param User                $user
+     * @param SerializerInterface $serializer
+     *
+     * @return JsonResponse
+     */
     #[Route('/bilemo/users/{id}', name: 'app_users_details', methods: ['GET'])]
     #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour consulter un utilisateur')]
     public function getUserDetails(
@@ -75,6 +112,26 @@ class UserController extends AbstractController
     }
 
     /**
+     * This method create a user linked to a customer
+     *
+     * @OA\Response(
+     *     response=201,
+     *     description="Create an user linked to a customer",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=User::class))
+     *     )
+     * )
+     * @OA\Tag(name="Users")
+     *
+     * @param Request                $request
+     * @param SerializerInterface    $serializer
+     * @param EntityManagerInterface $entityManager
+     * @param UrlGeneratorInterface  $urlGenerator
+     * @param ValidatorInterface     $validator
+     * @param TagAwareCacheInterface $cache
+     *
+     * @return JsonResponse
      * @throws InvalidArgumentException
      */
     #[Route('/bilemo/users/create', name: 'app_users_create', methods: ['POST'])]
@@ -116,6 +173,19 @@ class UserController extends AbstractController
     }
 
     /**
+     * This method delete a user
+     *
+     * @OA\Response(
+     *     response=204,
+     *     description="Delete an user"
+     * )
+     * @OA\Tag(name="Users")
+     *
+     * @param User                   $user
+     * @param EntityManagerInterface $entityManager
+     * @param TagAwareCacheInterface $cache
+     *
+     * @return JsonResponse
      * @throws InvalidArgumentException
      */
     #[Route('/bilemo/users/delete/{id}', name: 'app_users_delete', methods: ['DELETE'])]
