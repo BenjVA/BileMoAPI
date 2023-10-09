@@ -40,6 +40,7 @@ class ProductController extends AbstractController
      * @param ProductRepository      $productRepository
      * @param SerializerInterface    $serializer
      * @param TagAwareCacheInterface $cache
+     * @param Request                $request
      *
      * @return JsonResponse
      * @throws InvalidArgumentException
