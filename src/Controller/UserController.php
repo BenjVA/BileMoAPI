@@ -54,11 +54,14 @@ class UserController extends AbstractController
         UserRepository $userRepository,
         SerializerInterface $serializer,
         TagAwareCacheInterface $cache,
+        Request $request
     ): JsonResponse {
         $customer = $this->getUser();
+        $page = $request->get('page', 1);
         $adapter = new ArrayAdapter($userRepository->findPublicUsersByCustomer($customer));
-        $pager = new Pagerfanta($adapter);
+        $pager = Pagerfanta::createForCurrentPageWithMaxPerPage($adapter, $page, 5);
         $idCache = 'getAllUsers-';
+
 
         $jsonUserList = $cache->get(
             $idCache,

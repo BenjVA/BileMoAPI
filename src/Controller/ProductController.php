@@ -12,6 +12,7 @@ use Pagerfanta\Pagerfanta;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -49,10 +50,13 @@ class ProductController extends AbstractController
         ProductRepository $productRepository,
         SerializerInterface $serializer,
         TagAwareCacheInterface $cache,
+        Request $request
     ): JsonResponse {
+        $page = $request->get('page', 1);
         $adapter = new ArrayAdapter($productRepository->findAll());
-        $pager = new Pagerfanta($adapter);
+        $pager = Pagerfanta::createForCurrentPageWithMaxPerPage($adapter, $page, 5);
         $idCache = 'getAllProducts-';
+
 
         $jsonProductList = $cache->get(
             $idCache,
