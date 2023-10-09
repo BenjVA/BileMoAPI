@@ -62,7 +62,6 @@ class UserController extends AbstractController
         $pager = Pagerfanta::createForCurrentPageWithMaxPerPage($adapter, $page, 5);
         $idCache = 'getAllUsers-';
 
-
         $jsonUserList = $cache->get(
             $idCache,
             function (ItemInterface $item) use ($serializer, $pager) {
@@ -111,7 +110,13 @@ class UserController extends AbstractController
         $context = SerializationContext::create()->setGroups(array('getUsers'));
         $jsonUser = $serializer->serialize($user, 'json', $context);
 
-        return new JsonResponse($jsonUser, Response::HTTP_OK, [], true);
+        if ($this->getUser() === $user->getCustomer()) {
+            return new JsonResponse($jsonUser, Response::HTTP_OK, [], true);
+        }
+        $error = 'Vous ne pouvez pas consulter les détails de cet utilisateur';
+        $errorJson = $serializer->serialize($error, 'json');
+
+        return new JsonResponse($errorJson, Response::HTTP_NOT_FOUND, [], true);
     }
 
     /**
