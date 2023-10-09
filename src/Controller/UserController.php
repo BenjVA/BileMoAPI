@@ -134,7 +134,7 @@ class UserController extends AbstractController
      * @return JsonResponse
      * @throws InvalidArgumentException
      */
-    #[Route('/bilemo/users/create', name: 'app_users_create', methods: ['POST'])]
+    #[Route('/bilemo/users', name: 'app_users_create', methods: ['POST'])]
     #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour créer un utilisateur')]
     public function createUser(
         Request $request,
@@ -188,7 +188,7 @@ class UserController extends AbstractController
      * @return JsonResponse
      * @throws InvalidArgumentException
      */
-    #[Route('/bilemo/users/delete/{id}', name: 'app_users_delete', methods: ['DELETE'])]
+    #[Route('/bilemo/users/{id}', name: 'app_users_delete', methods: ['DELETE'])]
     #[IsGranted('ROLE_USER', message: 'Vous n\'avez pas les droits suffisants pour supprimer un utilisateur')]
     public function deleteUser(
         User $user,
